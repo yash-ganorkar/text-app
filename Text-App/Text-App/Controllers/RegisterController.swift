@@ -14,7 +14,8 @@ class RegisterController: UIViewController {
     @IBOutlet weak var password: UITextField!
     @IBOutlet weak var confirmPassword: UITextField!
     
-    var userLogin : UserLogin?
+    @IBOutlet weak var name: UITextField!
+    var userLogin : User?
     
      let activityIndicator = CustomActivityIndicator()
     
@@ -28,6 +29,8 @@ class RegisterController: UIViewController {
         let email = self.email.text
         let password = self.password.text
         let confirmPassword = self.confirmPassword.text
+        let name = self.name.text
+        
         
         activityIndicator.showActivityIndicator(uiView: self.view)
 
@@ -44,7 +47,7 @@ class RegisterController: UIViewController {
             
             alertController.addAction(okButton)
             self.present(alertController, animated: true, completion: nil)
-        } else if email == "" || password == "" || confirmPassword == "" {
+        } else if email == "" || password == "" || confirmPassword == "" || name == "" {
             let alertController = UIAlertController(title: "Alert", message: "One or more fields are empty!!", preferredStyle: .alert)
             
             let okButton = UIAlertAction(title: "OK", style: .default) { (_) in
@@ -60,24 +63,38 @@ class RegisterController: UIViewController {
         else {
             
             let accountLogin = FirebaseAccount()
-            userLogin = UserLogin()
+            userLogin = User()
             
             userLogin?.email = email!
             userLogin?.password = password!
+            userLogin?.name = name!
+            userLogin?.profileImage = defaultProfileImage
             
             accountLogin.accountSignUp(forUser: userLogin!) { (response) in
-                if response.details == "Successfull" {
-                    let alertController = UIAlertController(title: "Alert", message: "User registered successfully", preferredStyle: .alert)
+                if response.details.contains("Error") {
+                    //show alert
+                }
+                else {
                     
-                    let okButton = UIAlertAction(title: "OK", style: .default, handler: { (_) in
+                    self.userLogin?.userid = response.details
+                    
+                    accountLogin.createUserAccount(forUser: self.userLogin!, handler: { (response) in
+                      
+                        if response.details == "Successfull"{
+                            let alertController = UIAlertController(title: "Alert", message: "User registered successfully", preferredStyle: .alert)
+                            
+                            let okButton = UIAlertAction(title: "OK", style: .default, handler: { (_) in
+                                
+                                self.dismiss(animated: true, completion: nil)
+                            })
+                            
+                            alertController.addAction(okButton)
+                            
+                            self.activityIndicator.hideActivityIndicator(uiView: self.view)
+                            self.present(alertController, animated: true, completion: nil)
+                        }
                         
-                        self.dismiss(animated: true, completion: nil)
                     })
-                    
-                    alertController.addAction(okButton)
-                    
-                    self.activityIndicator.hideActivityIndicator(uiView: self.view)
-                    self.present(alertController, animated: true, completion: nil)
                 }
             }
         }

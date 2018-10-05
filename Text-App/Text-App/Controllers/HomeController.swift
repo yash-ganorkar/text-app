@@ -8,23 +8,33 @@
 
 import UIKit
 
+
 class HomeController: UIViewController {
     @IBOutlet weak var email: UITextField!
     @IBOutlet weak var password: UITextField!
     
-    var userlogin = UserLogin()
+    var userlogin = User()
     let activityIndicator = CustomActivityIndicator()
+    let accountLogin = FirebaseAccount()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        if accountLogin.checkUserLoginStatus() {
+            self.performSegue(withIdentifier: "ChatsVC", sender: self)
+        }
+        else {
+            
+        }
+    }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "RegisterVC" {
             _ = segue.destination as? RegisterController
         }
-        else if segue.identifier == "ChatsVC" {
+        if segue.identifier == "ChatsVC" {
             _ = segue.destination as? ChatsController
         }
     }
@@ -49,7 +59,7 @@ class HomeController: UIViewController {
             userlogin.email = email!
             userlogin.password = password!
             
-            let accountLogin = FirebaseAccount()
+            
             
             accountLogin.accountSignIn(forUser: userlogin) { (message) in
                 

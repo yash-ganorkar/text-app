@@ -8,17 +8,23 @@
 
 import Foundation
 
-class UserLogin : NSObject {
+class User : NSObject {
     
     //MARK: Properties
     
-    var email : String
-    var password : String
+    var email : String?
+    var password : String?
+    var name : String?
+    var userid : String?
+    var profileImage : String?
     
     //MARK: Initialization
     override init() {
         self.email = ""
         self.password = ""
+        self.name = ""
+        self.userid = ""
+        self.profileImage = ""
     }
     
 }
