@@ -14,6 +14,7 @@
 		580FC111216445FA004EC984 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 580FC10F216445FA004EC984 /* LaunchScreen.storyboard */; };
 		580FC11C216445FA004EC984 /* Text_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580FC11B216445FA004EC984 /* Text_AppTests.swift */; };
 		580FC127216445FA004EC984 /* Text_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580FC126216445FA004EC984 /* Text_AppUITests.swift */; };
+		5827B144216B314D00201B18 /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5827B143216B314D00201B18 /* ChatMessageCell.swift */; };
 		58CCAD8421645DAB00CD8E9B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 58CCAD8321645DAB00CD8E9B /* GoogleService-Info.plist */; };
 		58CCAD8521645DAB00CD8E9B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 58CCAD8321645DAB00CD8E9B /* GoogleService-Info.plist */; };
 		58CCAD8621645DAB00CD8E9B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 58CCAD8321645DAB00CD8E9B /* GoogleService-Info.plist */; };
@@ -30,6 +31,8 @@
 		58CCADAF2165DF5000CD8E9B /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCADAE2165DF5000CD8E9B /* NewMessageController.swift */; };
 		58CCADB121667C9F00CD8E9B /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCADB021667C9F00CD8E9B /* SettingsController.swift */; };
 		58CCADB32166BDF300CD8E9B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCADB22166BDF300CD8E9B /* Extensions.swift */; };
+		58CCADB52167E0D200CD8E9B /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCADB42167E0D200CD8E9B /* ChatLogController.swift */; };
+		58CCADB92168058300CD8E9B /* TextMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CCADB82168058300CD8E9B /* TextMessage.swift */; };
 		5FF3EC626F72B5B687340373 /* Pods_Text_AppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BCCD16C1437EC564C1032C1 /* Pods_Text_AppUITests.framework */; };
 		72FBF6A209AA91240DE395F3 /* Pods_Text_AppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BEF037B1A1A2964B37E43F6 /* Pods_Text_AppTests.framework */; };
 		FF83ACE8F2F74E41A6A408AA /* Pods_Text_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DEA45C9C4A1B237809094B3D /* Pods_Text_App.framework */; };
@@ -69,6 +72,7 @@
 		580FC122216445FA004EC984 /* Text-AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Text-AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		580FC126216445FA004EC984 /* Text_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text_AppUITests.swift; sourceTree = "<group>"; };
 		580FC128216445FA004EC984 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5827B143216B314D00201B18 /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
 		58CCAD8321645DAB00CD8E9B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		58CCAD87216466D900CD8E9B /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		58CCAD8D2164702400CD8E9B /* CustomActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomActivityIndicator.swift; sourceTree = "<group>"; };
@@ -81,6 +85,8 @@
 		58CCADAE2165DF5000CD8E9B /* NewMessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		58CCADB021667C9F00CD8E9B /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		58CCADB22166BDF300CD8E9B /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		58CCADB42167E0D200CD8E9B /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
+		58CCADB82168058300CD8E9B /* TextMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMessage.swift; sourceTree = "<group>"; };
 		5BEF037B1A1A2964B37E43F6 /* Pods_Text_AppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Text_AppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		672E05C91E32C221AACB9504 /* Pods-Text-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Text-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-Text-App/Pods-Text-App.release.xcconfig"; sourceTree = "<group>"; };
 		6BCCD16C1437EC564C1032C1 /* Pods_Text_AppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Text_AppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -180,6 +186,7 @@
 				58CCADA32164968D00CD8E9B /* RegisterController.swift */,
 				58CCADAE2165DF5000CD8E9B /* NewMessageController.swift */,
 				58CCADB021667C9F00CD8E9B /* SettingsController.swift */,
+				58CCADB42167E0D200CD8E9B /* ChatLogController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -188,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				58CCAD87216466D900CD8E9B /* User.swift */,
+				58CCADB82168058300CD8E9B /* TextMessage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -226,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				58CCADA82164A03500CD8E9B /* ChatCell.swift */,
+				5827B143216B314D00201B18 /* ChatMessageCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -493,11 +502,14 @@
 				58CCAD91216472F000CD8E9B /* FirebaseAccount.swift in Sources */,
 				58CCADAA2164A03500CD8E9B /* ChatCell.swift in Sources */,
 				58CCADAF2165DF5000CD8E9B /* NewMessageController.swift in Sources */,
+				5827B144216B314D00201B18 /* ChatMessageCell.swift in Sources */,
+				58CCADB92168058300CD8E9B /* TextMessage.swift in Sources */,
 				58CCAD8E2164702400CD8E9B /* CustomActivityIndicator.swift in Sources */,
 				58CCADA42164968D00CD8E9B /* RegisterController.swift in Sources */,
 				58CCADAD2165C31C00CD8E9B /* Constants.swift in Sources */,
 				58CCADB32166BDF300CD8E9B /* Extensions.swift in Sources */,
 				58CCAD942164761000CD8E9B /* Message.swift in Sources */,
+				58CCADB52167E0D200CD8E9B /* ChatLogController.swift in Sources */,
 				580FC107216445F8004EC984 /* AppDelegate.swift in Sources */,
 				58CCAD88216466D900CD8E9B /* User.swift in Sources */,
 				58CCADA721649FA700CD8E9B /* ChatsController.swift in Sources */,

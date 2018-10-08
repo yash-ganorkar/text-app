@@ -14,7 +14,8 @@ class FirebaseAccount {
     
     var message = Message()
     
-    
+    var textMessages = [TextMessage]()
+    var messageDictionary = [String : TextMessage]()
     
     func accountSignIn(forUser user: User, handler : @escaping(Message) -> ()) {
         
@@ -96,7 +97,7 @@ class FirebaseAccount {
     }
     
     func updateUserAccount(withUID uid: String, forUser user: User, handler: @escaping(String) -> ()) {
-        let dbref = Database.database().reference(fromURL: dburl)
+        let dbref = Database.database().reference()
         
         let usersReference = dbref.child("users")
         
@@ -146,21 +147,28 @@ class FirebaseAccount {
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
+
         
-    Database.database().reference().child("users").child(uid).observe(DataEventType.value, with:
-            { (snapshot) in
-                if let dictionary = snapshot.value as? [String : AnyObject] {
-                    user.email = dictionary["email"] as! String
-                    user.name = dictionary["name"] as! String
-                    user.profileImage = dictionary["profilePicURL"] as! String
-                    user.userid = uid
-                }
-                handler(user)
-            }, withCancel: nil)
+        let dbref = Database.database().reference().child("users")
+        
+        dbref.child(uid).observe(.value, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String : AnyObject] {
+                user.email = dictionary["email"] as! String
+                user.name = dictionary["name"] as! String
+                user.profileImage = dictionary["profilePicURL"] as! String
+                user.userid = uid
+            }
+            handler(user)
+        }) { (error) in
+            print(error)
+        }
     }
     
     func fetchAllUsers(handler : @escaping ([User]) -> ()) {
         var users = [User]()
+        guard let loggedInUser = Auth.auth().currentUser else {
+            return
+        }
         Database.database().reference().child("users").observe(DataEventType.childAdded, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 let user = User()
@@ -168,15 +176,116 @@ class FirebaseAccount {
                 user.name = dictionary["name"] as? String
                 user.email = dictionary["email"] as? String
                 user.profileImage = dictionary["profilePicURL"] as? String
-                
-//                if loggedInUser != user {
-//                  users.append(user)
-//                }
-                
-                users.append(user)
+                user.userid = snapshot.key
+                if loggedInUser.email != user.email {
+                  users.append(user)
+                }
+            }
+            handler(users)
+        }, withCancel: { (error) in
+            print(error)
+        })
+    }
+    
+    func sendMessage(messageText text: String, from: String, to: String, handler : @escaping () -> ()) {
+        let dbref = Database.database().reference().child("messages")
+        let childRef = dbref.childByAutoId()
+        let timeStamp = NSDate().timeIntervalSince1970
+        let values = ["text": text, "from": from, "to": to, "timestamp": timeStamp] as [String : Any]
+       // childRef.updateChildValues(values)
+        
+        childRef.updateChildValues(values) { (error, ref) in
+            if error != nil {
+                print(error!)
+                return
             }
             
-            handler(users)
+            let userMessagesRef = Database.database().reference().child("user-messages").child(from)
+            let messageId = childRef.key!
+            let val = [messageId : 1] as [String : Any]
+            userMessagesRef.updateChildValues(val) { (error, ref) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+                let receipientRef = Database.database().reference().child("user-messages").child(to)
+                
+                receipientRef.updateChildValues(val, withCompletionBlock: { (error
+                    , ref) in
+                    if error != nil {
+                        print(error!)
+                        return
+                    }
+                    handler()
+                })
+                
+            }
+        }
+    }
+    
+    func fetchAllMessages(withUID uid : String,handler : @escaping ([TextMessage]) -> ()) {
+    
+        let ref = Database.database().reference().child("user-messages").child(uid)
+        ref.observe(.childAdded, with: { (snapshot) in
+            
+            let messageId = snapshot.key
+            
+            let messageRef = Database.database().reference().child("messages").child(messageId)
+            
+            messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                
+                            if let dictionary = snapshot.value as? [String : AnyObject] {
+                                let textMessage = TextMessage()
+
+                                textMessage.from = dictionary["from"] as? String
+                                textMessage.text = dictionary["text"] as? String
+                                textMessage.timestamp = dictionary["timestamp"] as? NSNumber
+                                textMessage.to = dictionary["to"] as? String
+
+                                if let chatPartnerId = textMessage.chatPartnerId() {
+                                    self.messageDictionary[chatPartnerId] = textMessage
+
+                                    self.textMessages = Array(self.messageDictionary.values)
+                                    self.textMessages.sort(by: { (message1, message2) -> Bool in
+                                        return message1.timestamp!.intValue > message2.timestamp!.intValue
+                                    })
+                                }
+                                handler(self.textMessages)
+                            }
+            })
+        }, withCancel: {( error ) in
+            print(error)
+            
+        })
+    }
+    
+    func fetchUserNameAndProfilePicURL(withID id: String, handler : @escaping (String, String) -> ()) {
+        
+        let dbref = Database.database().reference().child("users").child(id)
+        dbref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String : AnyObject] {
+                handler((dictionary["name"] as? String)!, (dictionary["profilePicURL"] as? String)!)
+            }
+        }, withCancel: nil)
+    }
+    
+    func fetchUser(withID id: String, handler : @escaping (User) -> ()) {
+        
+        let user = User()
+        
+        let dbref = Database.database().reference().child("users").child(id)
+        dbref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String : AnyObject] {
+                
+                user.name = dictionary["name"] as? String
+                user.email = dictionary["email"] as? String
+                user.profileImage = dictionary["profilePicURL"] as? String
+                user.userid = snapshot.key
+                
+                handler(user)
+            }
         }, withCancel: nil)
     }
     

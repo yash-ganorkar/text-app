@@ -16,30 +16,40 @@ class ChatsController: UIViewController {
     
     let fbAccount = FirebaseAccount()
     var loggedInUser = User()
-
+    var messages = [TextMessage]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
+        tableView.register(ChatCell.self, forCellReuseIdentifier: "reuseIdentifier")
         setupLoggedInUserDetails()
     }
+    func observeMessages() {
+        fbAccount.fetchAllMessages(withUID: loggedInUser.userid!) { (textMessages) in
+            self.messages = textMessages
+            
+            self.timer?.invalidate()
+            
+            self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+        }
+    }
+    
+    @objc func handleReloadTable() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    var timer : Timer?
     
     func setupLoggedInUserDetails() {
         
         fbAccount.setupLoggedInUserDetails(forUser: loggedInUser) { (user) in
             self.loggedInUser = user
+            self.observeMessages()
         }
         
     }
-    
-    @IBAction func segmentValueIsChanged(_ sender: Any) {
-    }
-    
     
     @IBAction func logoutBtnWasPressed(_ sender: Any) {
         if fbAccount.accountSignOut() {
@@ -51,6 +61,7 @@ class ChatsController: UIViewController {
        // self.performSegue(withIdentifier: "NewMessageVC", sender: sender)
         
         let newMessageController = NewMessageController()
+        newMessageController.chatsController = self
         let navController = UINavigationController(rootViewController: newMessageController)
         
         self.present(navController, animated: true, completion: nil)
@@ -93,51 +104,46 @@ extension ChatsController : UITableViewDelegate, UITableViewDataSource {
     
      func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 50
+        return messages.count
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+        
+        guard let chatPartnerId = message.chatPartnerId() else {
+            return
+        }
+        
+        fbAccount.fetchUser(withID: chatPartnerId) { (response) in
+            let user = User()
+            
+            user.name = response.name
+            user.email = response.email
+            user.profileImage = response.profileImage
+            user.userid = chatPartnerId
+            
+            self.showChatController(user: user)
+        }
     }
     
     
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath) as! ChatCell
         
-        // Configure the cell...
+        let message = messages[indexPath.row]
+        cell.message = message
+        
         return cell
     }
     
+    func showChatController(user: User) {
+        
+        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+        chatLogController.user = user
+        navigationController?.pushViewController(chatLogController, animated: true)
+    }
     
-    /*
-     // Override to support conditional editing of the table view.
-     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
-     }
-     */
-    
-    /*
-     // Override to support editing the table view.
-     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-     if editingStyle == .delete {
-     // Delete the row from the data source
-     tableView.deleteRows(at: [indexPath], with: .fade)
-     } else if editingStyle == .insert {
-     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-     }
-     }
-     */
-    
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-     
-     }
-     */
-    
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
-
+     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80
+    }
 }
