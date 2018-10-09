@@ -14,6 +14,10 @@ class TextMessage: NSObject {
     var timestamp : NSNumber?
     var to : String?
     
+    var imageUrl: String?
+    var imageHeight : NSNumber?
+    var imageWidth : NSNumber?
+    
     func chatPartnerId() -> String? {
         
         return from == Auth.auth().currentUser?.uid ? to : from

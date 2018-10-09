@@ -28,10 +28,14 @@ class ChatsController: UIViewController {
         fbAccount.fetchAllMessages(withUID: loggedInUser.userid!) { (textMessages) in
             self.messages = textMessages
             
-            self.timer?.invalidate()
-            
-            self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+            self.attemptReloadOfTable()
         }
+    }
+    
+    private func attemptReloadOfTable() {
+        self.timer?.invalidate()
+        
+        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
     }
     
     @objc func handleReloadTable() {

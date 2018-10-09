@@ -25,7 +25,7 @@ class FirebaseAccount {
                 print(user?.user.displayName)
                 self.message.details = "Successfull"
                 handler(self.message)
-                }
+            }
             else {
                 guard let errorDescription = error?.localizedDescription else {
                     return
@@ -54,14 +54,14 @@ class FirebaseAccount {
                 self.message.details = "Error : \(errorDescription)"
                 handler(self.message)
             }
-
+            
         }
     }
     
     func createUserAccount(forUser user: User, handler: @escaping(Message) -> ())
     {
         let dbref = Database.database().reference(fromURL: dburl)
-    
+        
         let usersReference = dbref.child("users").child(user.userid!)
         let values = ["name": user.name!, "email": user.email!, "profilePicURL" : user.profileImage!]
         usersReference.updateChildValues(values) { (err, ref) in
@@ -81,15 +81,14 @@ class FirebaseAccount {
         let storageRef = Storage.storage().reference().child("profileImages").child(imageName)
         
         if let uploadData = image.jpegData(compressionQuality: 0.1) {
-        
-//        if let uploadData = image.pngData() {
+            
+            //        if let uploadData = image.pngData() {
             storageRef.putData(uploadData, metadata: nil) { (metadata, err) in
                 storageRef.downloadURL(completion: { (url, err) in
                     if err != nil {
                         print(err as Any)
                         handler("Error")
                     }
-                    print(url?.absoluteString)
                     handler((url?.absoluteString)!)
                 })
             }
@@ -104,7 +103,7 @@ class FirebaseAccount {
         let userDict = ["name" : user.name,
                         "email" : user.email,
                         "profilePicURL" : user.profileImage
-                        ]
+        ]
         
         usersReference.child(uid).setValue(userDict)
         handler("Successful")
@@ -147,7 +146,7 @@ class FirebaseAccount {
         guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
-
+        
         
         let dbref = Database.database().reference().child("users")
         
@@ -178,7 +177,7 @@ class FirebaseAccount {
                 user.profileImage = dictionary["profilePicURL"] as? String
                 user.userid = snapshot.key
                 if loggedInUser.email != user.email {
-                  users.append(user)
+                    users.append(user)
                 }
             }
             handler(users)
@@ -192,7 +191,7 @@ class FirebaseAccount {
         let childRef = dbref.childByAutoId()
         let timeStamp = NSDate().timeIntervalSince1970
         let values = ["text": text, "from": from, "to": to, "timestamp": timeStamp] as [String : Any]
-       // childRef.updateChildValues(values)
+        // childRef.updateChildValues(values)
         
         childRef.updateChildValues(values) { (error, ref) in
             if error != nil {
@@ -200,7 +199,7 @@ class FirebaseAccount {
                 return
             }
             
-            let userMessagesRef = Database.database().reference().child("user-messages").child(from)
+            let userMessagesRef = Database.database().reference().child("user-messages").child(from).child(to)
             let messageId = childRef.key!
             let val = [messageId : 1] as [String : Any]
             userMessagesRef.updateChildValues(val) { (error, ref) in
@@ -210,7 +209,44 @@ class FirebaseAccount {
                     return
                 }
                 
-                let receipientRef = Database.database().reference().child("user-messages").child(to)
+                let receipientRef = Database.database().reference().child("user-messages").child(to).child(from)
+                
+                receipientRef.updateChildValues(val, withCompletionBlock: { (error
+                    , ref) in
+                    if error != nil {
+                        print(error!)
+                        return
+                    }
+                    handler()
+                })
+                
+            }
+        }
+    }
+    
+    func sendImage(withImageUrl imageUrl: String, from: String, to: String, image: UIImage, handler : @escaping () -> ()) {
+        let dbref = Database.database().reference().child("messages")
+        let childRef = dbref.childByAutoId()
+        let timeStamp = NSDate().timeIntervalSince1970
+        let values = ["imageUrl": imageUrl, "from": from, "to": to, "timestamp": timeStamp, "imageWidth" : image.size.width, "imageHeight" : image.size.height] as [String : Any]
+        
+        childRef.updateChildValues(values) { (error, ref) in
+            if error != nil {
+                print(error!)
+                return
+            }
+            
+            let userMessagesRef = Database.database().reference().child("user-messages").child(from).child(to)
+            let messageId = childRef.key!
+            let val = [messageId : 1] as [String : Any]
+            userMessagesRef.updateChildValues(val) { (error, ref) in
+                
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                
+                let receipientRef = Database.database().reference().child("user-messages").child(to).child(from)
                 
                 receipientRef.updateChildValues(val, withCompletionBlock: { (error
                     , ref) in
@@ -226,34 +262,55 @@ class FirebaseAccount {
     }
     
     func fetchAllMessages(withUID uid : String,handler : @escaping ([TextMessage]) -> ()) {
-    
+        
         let ref = Database.database().reference().child("user-messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
             
-            let messageId = snapshot.key
+            let userId = snapshot.key
             
-            let messageRef = Database.database().reference().child("messages").child(messageId)
-            
-            messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            Database.database().reference().child("user-messages").child(uid).child(userId).observe(DataEventType.childAdded, with: { (snapshot) in
                 
-                            if let dictionary = snapshot.value as? [String : AnyObject] {
-                                let textMessage = TextMessage()
+                let messageId = snapshot.key
+                
+                let messageRef = Database.database().reference().child("messages").child(messageId)
+                
+                messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                    
+                    if let dictionary = snapshot.value as? [String : AnyObject] {
+                        let textMessage = TextMessage()
+                        
+                        textMessage.from = dictionary["from"] as? String
+                        
+                        if let text = dictionary["text"] as? String {
+                         textMessage.text = text
+                        }
 
-                                textMessage.from = dictionary["from"] as? String
-                                textMessage.text = dictionary["text"] as? String
-                                textMessage.timestamp = dictionary["timestamp"] as? NSNumber
-                                textMessage.to = dictionary["to"] as? String
+                        if let imageUrl = dictionary["imageUrl"] as? String {
+                            textMessage.imageUrl = imageUrl
+                            textMessage.imageWidth = dictionary["imageWidth"] as? NSNumber
+                            textMessage.imageHeight = dictionary["imageHeight"] as? NSNumber
 
-                                if let chatPartnerId = textMessage.chatPartnerId() {
-                                    self.messageDictionary[chatPartnerId] = textMessage
+                        }
 
-                                    self.textMessages = Array(self.messageDictionary.values)
-                                    self.textMessages.sort(by: { (message1, message2) -> Bool in
-                                        return message1.timestamp!.intValue > message2.timestamp!.intValue
-                                    })
-                                }
-                                handler(self.textMessages)
-                            }
+                        textMessage.timestamp = dictionary["timestamp"] as? NSNumber
+                        textMessage.to = dictionary["to"] as? String
+                        
+                        print(textMessage)
+                        
+                        if let chatPartnerId = textMessage.chatPartnerId() {
+                            self.messageDictionary[chatPartnerId] = textMessage
+                            
+                            self.textMessages = Array(self.messageDictionary.values)
+                            self.textMessages.sort(by: { (message1, message2) -> Bool in
+                                return message1.timestamp!.intValue > message2.timestamp!.intValue
+                            })
+                        }
+                        handler(self.textMessages)
+                    }
+                })
+                
+            }, withCancel: { (error) in
+                //
             })
         }, withCancel: {( error ) in
             print(error)
