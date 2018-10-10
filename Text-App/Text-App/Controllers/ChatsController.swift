@@ -23,7 +23,10 @@ class ChatsController: UIViewController {
         
         tableView.register(ChatCell.self, forCellReuseIdentifier: "reuseIdentifier")
         setupLoggedInUserDetails()
+        
+        tableView.allowsMultipleSelectionDuringEditing = true
     }
+    
     func observeMessages() {
         fbAccount.fetchAllMessages(withUID: loggedInUser.userid!) { (textMessages) in
             self.messages = textMessages
@@ -149,5 +152,20 @@ extension ChatsController : UITableViewDelegate, UITableViewDataSource {
     
      func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        let message = self.messages[indexPath.row]
+        
+        fbAccount.deleteChats(message: message) { (response) in
+            if response {
+                self.observeMessages()
+            }
+        }
     }
 }

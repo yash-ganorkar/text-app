@@ -15,7 +15,12 @@ class ChatCell: UITableViewCell {
         didSet {
             
             setupNameAndProfileImage()
-            detailTextLabel?.text = message?.text
+            if let imageUrl = message?.imageUrl {
+             detailTextLabel?.text = "📷 Photo"
+            }
+            else if let text = message?.text {
+                detailTextLabel?.text = text
+            }
             
             if let seconds = message?.timestamp?.doubleValue{
                 let timestampDate = NSDate(timeIntervalSince1970: seconds)

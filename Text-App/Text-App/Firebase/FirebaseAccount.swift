@@ -346,4 +346,23 @@ class FirebaseAccount {
         }, withCancel: nil)
     }
     
+    func deleteChats(message: TextMessage, handler : @escaping(Bool) -> ()) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        if let chatPartnerId = message.chatPartnerId() {
+            let dbref = Database.database().reference().child("user-messages").child(uid).child(chatPartnerId)
+            
+            dbref.removeValue { (error, ref) in
+                if error != nil {
+                    print("Failed to delete message", error)
+                    handler(false)
+                }
+                self.messageDictionary.removeValue(forKey: chatPartnerId)
+                handler(true)
+            }
+
+        }
+        
+    }
+    
 }
