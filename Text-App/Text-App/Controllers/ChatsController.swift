@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ChatsController: UIViewController {
     
@@ -17,22 +18,27 @@ class ChatsController: UIViewController {
     let fbAccount = FirebaseAccount()
     var loggedInUser = User()
     var messages = [TextMessage]()
+    let activityIndicator = CustomActivityIndicator()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.register(ChatCell.self, forCellReuseIdentifier: "reuseIdentifier")
+    
+        activityIndicator.showActivityIndicator(uiView: self.view)
         setupLoggedInUserDetails()
         
         tableView.allowsMultipleSelectionDuringEditing = true
     }
     
     func observeMessages() {
+        
         fbAccount.fetchAllMessages(withUID: loggedInUser.userid!) { (textMessages) in
             self.messages = textMessages
             
             self.attemptReloadOfTable()
         }
+        self.activityIndicator.hideActivityIndicator(uiView: self.view)
     }
     
     private func attemptReloadOfTable() {
@@ -97,6 +103,12 @@ class ChatsController: UIViewController {
         performSegue(withIdentifier: "SettingsVC", sender: self)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+       self.tableView.reloadData()
+    }
+    
 }
 
 extension ChatsController : UITableViewDelegate, UITableViewDataSource {
@@ -116,6 +128,8 @@ extension ChatsController : UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let message = messages[indexPath.row]
+        
+        tableView.deselectRow(at: indexPath, animated: true)
         
         guard let chatPartnerId = message.chatPartnerId() else {
             return
@@ -140,6 +154,7 @@ extension ChatsController : UITableViewDelegate, UITableViewDataSource {
         let message = messages[indexPath.row]
         cell.message = message
         
+        self.activityIndicator.hideActivityIndicator(uiView: self.view)
         return cell
     }
     
@@ -169,3 +184,4 @@ extension ChatsController : UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
+

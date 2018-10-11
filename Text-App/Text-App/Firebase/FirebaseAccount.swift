@@ -9,6 +9,7 @@
 import Foundation
 import Firebase
 import FirebaseAuth
+import UserNotifications
 
 class FirebaseAccount {
     
@@ -22,7 +23,6 @@ class FirebaseAccount {
         Auth.auth().signIn(withEmail: user.email!, password: user.password!)
         { (user, error) in
             if error == nil {
-                print(user?.user.displayName)
                 self.message.details = "Successfull"
                 handler(self.message)
             }
@@ -137,7 +137,6 @@ class FirebaseAccount {
             print("User logged out!!")
             return false
         }
-        print("User logged in!!")
         return true
     }
     
@@ -263,6 +262,7 @@ class FirebaseAccount {
     
     func fetchAllMessages(withUID uid : String,handler : @escaping ([TextMessage]) -> ()) {
         
+        guard let user = Auth.auth().currentUser else { return }
         let ref = Database.database().reference().child("user-messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
             
@@ -294,9 +294,7 @@ class FirebaseAccount {
 
                         textMessage.timestamp = dictionary["timestamp"] as? NSNumber
                         textMessage.to = dictionary["to"] as? String
-                        
-                        print(textMessage)
-                        
+                                                
                         if let chatPartnerId = textMessage.chatPartnerId() {
                             self.messageDictionary[chatPartnerId] = textMessage
                             
@@ -305,6 +303,17 @@ class FirebaseAccount {
                                 return message1.timestamp!.intValue > message2.timestamp!.intValue
                             })
                         }
+                        if textMessage.from != user.uid {
+                            
+                            guard let messageTimestamp = textMessage.timestamp?.intValue else { return }
+                            let timeStamp = NSDate().timeIntervalSince1970
+                            
+                            let difference = messageTimestamp - Int(timeStamp)
+                            if difference >= -5 && difference <= 0  {
+                                self.sendNotification(textMessage: textMessage)
+                        }
+                        }
+
                         handler(self.textMessages)
                     }
                 })
@@ -316,6 +325,35 @@ class FirebaseAccount {
             print(error)
             
         })
+    }
+        
+    private func sendNotification(textMessage: TextMessage){
+        
+        guard let from = textMessage.from else { return }
+        
+        self.fetchUser(withID: from) { (user) in
+         
+            let content = UNMutableNotificationContent()
+            if let from = user.name, let text = textMessage.text {
+                content.title = from
+                content.body = text
+            } else if let imageUrl = textMessage.imageUrl, let from = user.name {
+                content.title = from
+                content.body = "📷 Photo"
+            }
+            
+            content.sound = UNNotificationSound.default
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            
+            let request = UNNotificationRequest(identifier: "notificationRequest", content: content, trigger: trigger)
+            
+            let center = UNUserNotificationCenter.current()
+            center.add(request, withCompletionHandler: { (error) in
+                print(error)
+            })
+
+        }
     }
     
     func fetchUserNameAndProfilePicURL(withID id: String, handler : @escaping (String, String) -> ()) {

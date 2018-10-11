@@ -11,6 +11,7 @@ import Firebase
 
 class ChatCell: UITableViewCell {
     let fbAccount = FirebaseAccount()
+    
     var message : TextMessage? {
         didSet {
             

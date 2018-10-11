@@ -24,8 +24,7 @@ extension UIImageView {
         URLSession.shared.dataTask(with: url!) { (data, response, err) in
             
             guard let data = data, err == nil else { return }
-            print(response?.suggestedFilename ?? url!.lastPathComponent)
-            print("Download Finished")
+            
             DispatchQueue.main.async() {
                 if let downloadedImage = UIImage(data: data){
                     imageCache.setObject(downloadedImage, forKey: urlString as NSString)
@@ -45,7 +44,7 @@ extension NSLayoutConstraint {
 }
 
 //extension UIDevice {
-//    
+//
 //    static let modelName: String = {
 //        var systemInfo = utsname()
 //        uname(&systemInfo)
@@ -54,7 +53,7 @@ extension NSLayoutConstraint {
 //            guard let value = element.value as? Int8, value != 0 else { return identifier }
 //            return identifier + String(UnicodeScalar(UInt8(value)))
 //        }
-//        
+//
 //        func mapToDevice(identifier: String) -> String { // swiftlint:disable:this cyclomatic_complexity
 //            #if os(iOS)
 //            switch identifier {
@@ -108,8 +107,8 @@ extension NSLayoutConstraint {
 //            }
 //            #endif
 //        }
-//        
+//
 //        return mapToDevice(identifier: identifier)
 //    }()
-//    
+//
 //}

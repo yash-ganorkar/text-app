@@ -73,6 +73,7 @@
 		580FC126216445FA004EC984 /* Text_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text_AppUITests.swift; sourceTree = "<group>"; };
 		580FC128216445FA004EC984 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5827B143216B314D00201B18 /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
+		5827B145216DE3A900201B18 /* Text-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Text-App.entitlements"; sourceTree = "<group>"; };
 		58CCAD8321645DAB00CD8E9B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		58CCAD87216466D900CD8E9B /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		58CCAD8D2164702400CD8E9B /* CustomActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomActivityIndicator.swift; sourceTree = "<group>"; };
@@ -148,6 +149,7 @@
 		580FC105216445F8004EC984 /* Text-App */ = {
 			isa = PBXGroup;
 			children = (
+				5827B145216DE3A900201B18 /* Text-App.entitlements */,
 				58CCADA521649F4F00CD8E9B /* Views */,
 				58CCAD8F216471C500CD8E9B /* Firebase */,
 				58CCAD8C21646FE300CD8E9B /* Utils */,
@@ -334,6 +336,14 @@
 				TargetAttributes = {
 					580FC102216445F8004EC984 = {
 						CreatedOnToolsVersion = 10.0;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					580FC116216445FA004EC984 = {
 						CreatedOnToolsVersion = 10.0;
@@ -690,6 +700,7 @@
 			baseConfigurationReference = FA61BB36A962D41FDE3571D6 /* Pods-Text-App.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Text-App/Text-App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 55HT2TPY98;
 				INFOPLIST_FILE = "$(SRCROOT)/Text-App/Supporting Files/Info.plist";
@@ -709,6 +720,7 @@
 			baseConfigurationReference = 672E05C91E32C221AACB9504 /* Pods-Text-App.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Text-App/Text-App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 55HT2TPY98;
 				INFOPLIST_FILE = "$(SRCROOT)/Text-App/Supporting Files/Info.plist";

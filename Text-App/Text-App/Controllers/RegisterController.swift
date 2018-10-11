@@ -84,7 +84,6 @@ class RegisterController: UIViewController {
                             let alertController = UIAlertController(title: "Alert", message: "User registered successfully", preferredStyle: .alert)
                             
                             let okButton = UIAlertAction(title: "OK", style: .default, handler: { (_) in
-                                
                                 self.dismiss(animated: true, completion: nil)
                             })
                             
@@ -99,17 +98,6 @@ class RegisterController: UIViewController {
             }
         }
     }
-    
-    
-//    // MARK: - Navigation
-//
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "HomeVC" {
-//            _ = segue.destination as? HomeController
-//        }
-//    }
-    
-    
 }
 
 
